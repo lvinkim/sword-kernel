@@ -58,4 +58,20 @@ class Kernel implements KernelInterface
             $response->end($actionResponse->getBody());
         }
     }
+
+    /**
+     * @return ContainerBuilder
+     */
+    public function getContainer(): ContainerBuilder
+    {
+        return $this->container;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSettings()
+    {
+        return $this->settings;
+    }
 }

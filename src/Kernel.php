@@ -25,7 +25,7 @@ class Kernel implements KernelInterface
      * Kernel constructor.
      * @param $settings
      */
-    public function __construct($settings)
+    public function __construct(array $settings)
     {
         $this->settings = $settings;
         $this->container = new ContainerBuilder();
@@ -38,6 +38,8 @@ class Kernel implements KernelInterface
      */
     public function dispatchWorkerStart(int $workerId)
     {
+        $this->settings["workerId"] = $workerId;
+
         $loadProcessor = new LoadProcessor($this->container);
         $loadProcessor->onEvent($this->settings);
     }
@@ -46,12 +48,13 @@ class Kernel implements KernelInterface
      * 在 onRequest 回调事件中的处理函数
      * @param Request $request
      * @param Response $response
+     * @param \swoole_table $table
      * @return mixed|void
      */
-    public function dispatchRequest(Request $request, Response $response)
+    public function dispatchRequest(Request $request, Response $response, \swoole_table $table)
     {
         $requestProcessor = new RequestProcessor($this->container);
-        $actionResponse = $requestProcessor->onEvent($request, $response, $this->settings);
+        $actionResponse = $requestProcessor->onEvent($request, $response, $this->settings, $table);
 
         if (!$actionResponse->isSent()) {
             $response->header("Content-Type", $actionResponse->getContentType());

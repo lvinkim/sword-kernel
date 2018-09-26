@@ -32,8 +32,9 @@ interface KernelInterface
      * 在 onRequest 回调事件中的处理函数
      * @param Request $request
      * @param Response $response
+     * @param \swoole_table $table
      * @return mixed
      */
-    public function dispatchRequest(Request $request, Response $response);
+    public function dispatchRequest(Request $request, Response $response, \swoole_table $table);
 
 }

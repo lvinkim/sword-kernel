@@ -11,6 +11,7 @@ return (function () {
 
     return [
         "/" => \Lvinkim\SwordKernel\Tests\App\Action\IndexAction::class,
+        "/update" => \Lvinkim\SwordKernel\Tests\App\Action\UpdateAction::class,
     ];
 
 })();

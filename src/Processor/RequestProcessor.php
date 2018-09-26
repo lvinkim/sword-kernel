@@ -32,9 +32,10 @@ class RequestProcessor
      * @param Request $request
      * @param Response $response
      * @param $settings
+     * @param \swoole_table $table
      * @return ActionResponse
      */
-    public function onEvent(Request $request, Response $response, $settings): ActionResponse
+    public function onEvent(Request $request, Response $response, $settings, \swoole_table $table): ActionResponse
     {
         $pathInfo = $request->server["path_info"] ?? "/";
 
@@ -45,7 +46,7 @@ class RequestProcessor
         try {
             /** @var ActionInterface $classObject */
             $classObject = $this->container->get($actionClass);
-            $actionResponse = $classObject->__invoke($request, $response, $settings);
+            $actionResponse = $classObject->__invoke($request, $response, $settings, $table);
         } catch (\Exception $exception) {
             $actionResponse = new ActionResponse(json_encode(["message" => $exception->getMessage()]));
         }

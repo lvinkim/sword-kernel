@@ -15,10 +15,12 @@ class ActionResponse
      * ActionResponse constructor.
      * @param string $body
      * @param bool $sent
+     * @param string $contentType
      */
-    public function __construct(string $body = "{}", bool $sent = false)
+    public function __construct(string $body = "{}", $contentType = "application/json;charset=utf-8", bool $sent = false)
     {
         $this->setBody($body);
+        $this->setContentType($contentType);
         $this->setSent($sent);
     }
 
@@ -26,24 +28,28 @@ class ActionResponse
      * 是否已在 Action 类中返回响应
      * @var bool
      */
-    private $sent = false;
+    private
+        $sent = false;
 
     /**
      * header 的 content type
      * @var string
      */
-    private $contentType = "application/json;charset=utf-8";
+    private
+        $contentType = "application/json;charset=utf-8";
 
     /**
      * http 报文 body
      * @var string
      */
-    private $body = "{}";
+    private
+        $body = "{}";
 
     /**
      * @return bool
      */
-    public function isSent(): bool
+    public
+    function isSent(): bool
     {
         return $this->sent;
     }
@@ -51,7 +57,8 @@ class ActionResponse
     /**
      * @param bool $sent
      */
-    public function setSent(bool $sent): void
+    public
+    function setSent(bool $sent): void
     {
         $this->sent = $sent;
     }
@@ -59,7 +66,8 @@ class ActionResponse
     /**
      * @return string
      */
-    public function getContentType(): string
+    public
+    function getContentType(): string
     {
         return $this->contentType;
     }
@@ -67,7 +75,8 @@ class ActionResponse
     /**
      * @param string $contentType
      */
-    public function setContentType(string $contentType): void
+    public
+    function setContentType(string $contentType): void
     {
         $this->contentType = $contentType;
     }
@@ -75,7 +84,8 @@ class ActionResponse
     /**
      * @return string
      */
-    public function getBody(): string
+    public
+    function getBody(): string
     {
         return $this->body;
     }
@@ -83,7 +93,8 @@ class ActionResponse
     /**
      * @param string $body
      */
-    public function setBody(string $body): void
+    public
+    function setBody(string $body): void
     {
         $this->body = $body;
     }

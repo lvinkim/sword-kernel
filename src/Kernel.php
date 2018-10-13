@@ -137,4 +137,20 @@ class Kernel implements KernelInterface
         }
         krsort($this->requestMiddleware, SORT_NUMERIC);
     }
+
+    /**
+     * @return ContainerBuilder
+     */
+    public function getContainer(): ContainerBuilder
+    {
+        return $this->container;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSettings(): array
+    {
+        return $this->settings;
+    }
 }

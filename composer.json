@@ -2,7 +2,6 @@
   "name": "lvinkim/sword-kernel",
   "require": {
     "php": "^7.1",
-    "symfony/event-dispatcher": "^4.1",
     "symfony/dependency-injection": "^4.1",
     "haydenpierce/class-finder": "^0.2.0",
     "vlucas/phpdotenv": "^2.5"
@@ -18,7 +17,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Lvinkim\\SwordKernel\\Tests\\": "tests/"
+      "Lvinkim\\SwordKernel\\Tests\\": "tests/",
+      "Lvinkim\\SwordKernel\\Tests\\App\\": "tests/src/"
     }
   }
 }

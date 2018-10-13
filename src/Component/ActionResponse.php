@@ -11,63 +11,37 @@ namespace Lvinkim\SwordKernel\Component;
 
 class ActionResponse
 {
-    /**
-     * ActionResponse constructor.
-     * @param string $body
-     * @param bool $sent
-     * @param string $contentType
-     */
-    public function __construct(string $body = "{}", $contentType = "application/json;charset=utf-8", bool $sent = false)
-    {
-        $this->setBody($body);
-        $this->setContentType($contentType);
-        $this->setSent($sent);
-    }
-
-    /**
-     * 是否已在 Action 类中返回响应
-     * @var bool
-     */
-    private
-        $sent = false;
+    private $statusCode = 200;
 
     /**
      * header 的 content type
      * @var string
      */
-    private
-        $contentType = "application/json;charset=utf-8";
+    private $contentType = "application/json;charset=utf-8";
 
     /**
      * http 报文 body
      * @var string
      */
-    private
-        $body = "{}";
+    private $body = "{}";
 
     /**
-     * @return bool
+     * ActionResponse constructor.
+     * @param string $body
+     * @param string $contentType
+     * @param int $statusCode
      */
-    public
-    function isSent(): bool
+    public function __construct(string $body = "{}", $contentType = "application/json;charset=utf-8", $statusCode = 200)
     {
-        return $this->sent;
-    }
-
-    /**
-     * @param bool $sent
-     */
-    public
-    function setSent(bool $sent): void
-    {
-        $this->sent = $sent;
+        $this->setBody($body);
+        $this->setContentType($contentType);
+        $this->setStatusCode($statusCode);
     }
 
     /**
      * @return string
      */
-    public
-    function getContentType(): string
+    public function getContentType(): string
     {
         return $this->contentType;
     }
@@ -75,8 +49,7 @@ class ActionResponse
     /**
      * @param string $contentType
      */
-    public
-    function setContentType(string $contentType): void
+    public function setContentType(string $contentType): void
     {
         $this->contentType = $contentType;
     }
@@ -84,8 +57,7 @@ class ActionResponse
     /**
      * @return string
      */
-    public
-    function getBody(): string
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -93,9 +65,24 @@ class ActionResponse
     /**
      * @param string $body
      */
-    public
-    function setBody(string $body): void
+    public function setBody(string $body): void
     {
         $this->body = $body;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
+
+    /**
+     * @param int $statusCode
+     */
+    public function setStatusCode(int $statusCode): void
+    {
+        $this->statusCode = $statusCode;
     }
 }

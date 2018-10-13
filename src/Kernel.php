@@ -9,17 +9,31 @@
 namespace Lvinkim\SwordKernel;
 
 
+use Lvinkim\SwordKernel\Component\ActionInterface;
+use Lvinkim\SwordKernel\Component\ActionResponse;
 use Lvinkim\SwordKernel\Component\KernelInterface;
+use Lvinkim\SwordKernel\Component\RequestMiddlewareInterface;
+use Lvinkim\SwordKernel\Component\WorkerMiddlewareInterface;
 use Lvinkim\SwordKernel\Processor\LoadProcessor;
-use Lvinkim\SwordKernel\Processor\RequestProcessor;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\Table;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class Kernel implements KernelInterface
 {
     private $container;
     private $settings;
+
+    /**
+     * @var WorkerMiddlewareInterface[]
+     */
+    private $workerMiddleware = [];
+
+    /**
+     * @var RequestMiddlewareInterface[]
+     */
+    private $requestMiddleware = [];
 
     /**
      * Kernel constructor.
@@ -34,52 +48,89 @@ class Kernel implements KernelInterface
     /**
      * 在 onWorkerStart 回调事件中的处理函数
      * @param int $workerId
+     * @param Table $table
      * @return mixed|void
+     * @throws \Exception
      */
-    public function dispatchWorkerStart(int $workerId)
+    public function dispatchWorkerStart(int $workerId, Table $table)
     {
         $this->settings["workerId"] = $workerId;
 
         $loadProcessor = new LoadProcessor($this->container);
-        $loadProcessor->onEvent($this->settings);
+        $loadProcessor->load($this->settings);
+
+        $this->collectMiddleware();
+
+        foreach ($this->workerMiddleware as $middleware) {
+            $middleware->__invoke($this->settings, $table);
+        }
     }
 
     /**
      * 在 onRequest 回调事件中的处理函数
      * @param Request $request
      * @param Response $response
-     * @param \swoole_table $table
+     * @param Table $table
      * @return mixed|void
      */
-    public function dispatchRequest(Request $request, Response $response, \swoole_table $table)
+    public function dispatchRequest(Request $request, Response $response, Table $table)
     {
-        $requestProcessor = new RequestProcessor($this->container);
-        $actionResponse = $requestProcessor->onEvent($request, $response, $this->settings, $table);
+        $pathInfo = $request->server["path_info"] ?? "/";
+        $routes = $this->settings["routes"];
+        $actionClass = $routes[$pathInfo] ?? false;
 
-        if (!$actionResponse->isSent()) {
-            $response->header("Content-Type", $actionResponse->getContentType());
+        try {
 
-            $contentBlocks = str_split($actionResponse->getBody(), 2046 * 1024);
-            foreach ($contentBlocks as $block) {
-                $response->write($block);
+            foreach ($this->requestMiddleware as $middleware) {
+                $middleware->before($request, $response, $this->settings, $table);
             }
-            $response->end();
+
+            /** @var ActionInterface $classObject */
+            $classObject = $this->container->get($actionClass);
+            $actionResponse = $classObject->__invoke($request, $response, $this->settings, $table);
+
+            foreach ($this->requestMiddleware as $middleware) {
+                $middleware->after($request, $response, $this->settings, $table);
+            }
+
+        } catch (\Throwable $exception) {
+            $actionResponse = new ActionResponse(json_encode(["message" => $exception->getMessage()]));
+            $actionResponse->setStatusCode(500);
         }
+
+        $response->status($actionResponse->getStatusCode());
+        $response->header("Content-Type", $actionResponse->getContentType());
+
+        $contentBlocks = str_split($actionResponse->getBody(), 2046 * 1024);
+        foreach ($contentBlocks as $block) {
+            $response->write($block);
+        }
+        $response->end();
     }
 
     /**
-     * @return ContainerBuilder
+     * @throws \Exception
      */
-    public function getContainer(): ContainerBuilder
+    private function collectMiddleware()
     {
-        return $this->container;
-    }
+        $this->workerMiddleware = [];
+        foreach ($this->container->getServiceIds() as $serviceId) {
+            if (is_subclass_of($serviceId, WorkerMiddlewareInterface::class)) {
+                /** @var WorkerMiddlewareInterface $middleware */
+                $middleware = $this->container->get($serviceId);
+                $this->workerMiddleware[$middleware->priority()] = $middleware;
+            }
+        }
+        krsort($this->workerMiddleware, SORT_NUMERIC);
 
-    /**
-     * @return mixed
-     */
-    public function getSettings()
-    {
-        return $this->settings;
+        $this->requestMiddleware = [];
+        foreach ($this->container->getServiceIds() as $serviceId) {
+            if (is_subclass_of($serviceId, RequestMiddlewareInterface::class)) {
+                /** @var RequestMiddlewareInterface $middleware */
+                $middleware = $this->container->get($serviceId);
+                $this->requestMiddleware[$middleware->priority()] = $middleware;
+            }
+        }
+        krsort($this->requestMiddleware, SORT_NUMERIC);
     }
 }

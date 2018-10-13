@@ -11,6 +11,7 @@ namespace Lvinkim\SwordKernel\Component;
 
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\Table;
 use Symfony\Component\DependencyInjection\Container;
 
 interface ActionInterface
@@ -27,8 +28,8 @@ interface ActionInterface
      * @param Request $request
      * @param Response $response
      * @param array $settings
-     * @param \swoole_table $table
+     * @param Table $table
      * @return ActionResponse
      */
-    public function __invoke(Request $request, Response $response, array $settings, \swoole_table $table): ActionResponse;
+    public function __invoke(Request $request, Response $response, array $settings, Table $table): ActionResponse;
 }

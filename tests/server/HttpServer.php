@@ -1,9 +1,12 @@
 <?php
 
+namespace Lvinkim\SwordKernel\Server;
+
 use Lvinkim\SwordKernel\Component\KernelInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;
+use Swoole\Table;
 
 /**
  * Created by PhpStorm.
@@ -17,7 +20,7 @@ class HttpServer
     /** @var KernelInterface */
     private $kernel;
 
-    /** @var swoole_table */
+    /** @var Table */
     private $table;
 
     private $config;
@@ -63,7 +66,7 @@ class HttpServer
 
         $this->kernel = new $kernelClassName($settings);
 
-        $this->kernel->dispatchWorkerStart($workerId);
+        $this->kernel->dispatchWorkerStart($workerId, $this->table);
 
     }
 
@@ -81,10 +84,10 @@ class HttpServer
     {
         $tableSize = intval($this->config["tableSize"] ?? 1024);
         $tableColumns = (array)($this->config["tableColumns"] ?? []);
-        $this->table = new swoole_table($tableSize);
+        $this->table = new Table($tableSize);
         foreach ($tableColumns as $column) {
             $name = strval($column["name"] ?? "");
-            $type = intval($column["type"] ?? swoole_table::TYPE_STRING);
+            $type = intval($column["type"] ?? Table::TYPE_STRING);
             $size = intval($column["size"] ?? 4);
             if ($name) {
                 $this->table->column($name, $type, $size);

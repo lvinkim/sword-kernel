@@ -11,4 +11,4 @@ services:
     working_dir: /var/www/html
     command:
       - php
-      - tests/App/bin/server.php
+      - tests/bin/server.php

@@ -30,7 +30,7 @@ class LoadProcessor
     /**
      * @param $settings
      */
-    public function onEvent($settings)
+    public function load($settings)
     {
         $this->settings = $settings;
 
@@ -45,6 +45,11 @@ class LoadProcessor
             $this->container->set($actionClass, $actionObject);
         }
 
+        // Middleware 同样依赖 Service
+        foreach ($this->getAllMiddlewareClasses() as $middlewareClass) {
+            $middlewareObject = new $middlewareClass($this->container);
+            $this->container->set($middlewareClass, $middlewareObject);
+        }
     }
 
     /**
@@ -68,6 +73,19 @@ class LoadProcessor
         $projectDir = $this->settings["projectDir"];
         $actionDir = $projectDir . "/src/Action";
         $namespace = $this->settings["namespace"] . "\Action";
+        $classes = $this->getClassesRecursion($actionDir, $namespace);
+
+        return $classes;
+    }
+
+    /**
+     * @return array
+     */
+    private function getAllMiddlewareClasses()
+    {
+        $projectDir = $this->settings["projectDir"];
+        $actionDir = $projectDir . "/src/Middleware";
+        $namespace = $this->settings["namespace"] . "\Middleware";
         $classes = $this->getClassesRecursion($actionDir, $namespace);
 
         return $classes;

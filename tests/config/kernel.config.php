@@ -10,7 +10,7 @@ return (function () {
 
     return [
         "kernel" => "\Lvinkim\SwordKernel\Kernel",
-        "vendor" => dirname(__DIR__) . "/../../vendor/autoload.php",
+        "vendor" => dirname(__DIR__) . "/../vendor/autoload.php",
         "settings" => __DIR__ . "/settings.config.php",
         "swoole" => [
 //            "worker_num" => 4,

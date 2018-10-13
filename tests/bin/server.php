@@ -10,6 +10,6 @@ require dirname(__DIR__) . "/server/HttpServer.php";
 
 $setting = require dirname(__DIR__) . "/config/kernel.config.php";
 
-$httpServer = new HttpServer($setting);
+$httpServer = new \Lvinkim\SwordKernel\Server\HttpServer($setting);
 
 $httpServer->run();

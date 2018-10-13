@@ -9,7 +9,6 @@
 namespace Lvinkim\SwordKernel\Component;
 
 
-use Swoole\Table;
 use Symfony\Component\DependencyInjection\Container;
 
 interface WorkerMiddlewareInterface
@@ -23,9 +22,8 @@ interface WorkerMiddlewareInterface
 
     /**
      * @param $settings
-     * @param Table $table
      */
-    public function __invoke($settings, Table $table);
+    public function __invoke($settings);
 
     /**
      * 执行顺序，值越大，优先级越高

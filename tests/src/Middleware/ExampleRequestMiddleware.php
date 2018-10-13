@@ -9,6 +9,7 @@
 namespace Lvinkim\SwordKernel\Tests\App\Middleware;
 
 
+use Lvinkim\SwordKernel\Component\ActionResponse;
 use Lvinkim\SwordKernel\Component\RequestMiddlewareInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
@@ -45,8 +46,9 @@ class ExampleRequestMiddleware implements RequestMiddlewareInterface
      * @param Response $response
      * @param $settings
      * @param Table $table
+     * @param ActionResponse $actionResponse
      */
-    public function after(Request $request, Response $response, $settings, Table $table)
+    public function after(Request $request, Response $response, $settings, Table $table, ActionResponse $actionResponse)
     {
         $workerId = $settings["workerId"] ?? 0;
         echo "worker {$workerId} - " . __METHOD__ . PHP_EOL;

@@ -48,11 +48,10 @@ class Kernel implements KernelInterface
     /**
      * 在 onWorkerStart 回调事件中的处理函数
      * @param int $workerId
-     * @param Table $table
      * @return mixed|void
      * @throws \Exception
      */
-    public function dispatchWorkerStart(int $workerId, Table $table)
+    public function dispatchWorkerStart(int $workerId)
     {
         $this->settings["workerId"] = $workerId;
 
@@ -62,7 +61,7 @@ class Kernel implements KernelInterface
         $this->collectMiddleware();
 
         foreach ($this->workerMiddleware as $middleware) {
-            $middleware->__invoke($this->settings, $table);
+            $middleware->__invoke($this->settings);
         }
     }
 
@@ -85,12 +84,17 @@ class Kernel implements KernelInterface
                 $middleware->before($request, $response, $this->settings, $table);
             }
 
-            /** @var ActionInterface $classObject */
-            $classObject = $this->container->get($actionClass);
-            $actionResponse = $classObject->__invoke($request, $response, $this->settings, $table);
+            try {
+                /** @var ActionInterface $classObject */
+                $classObject = $this->container->get($actionClass);
+                $actionResponse = $classObject->__invoke($request, $response, $this->settings, $table);
+            } catch (\Throwable $exception) {
+                $actionResponse = new ActionResponse(json_encode(["message" => $exception->getMessage()]));
+                $actionResponse->setStatusCode(500);
+            }
 
             foreach ($this->requestMiddleware as $middleware) {
-                $middleware->after($request, $response, $this->settings, $table);
+                $middleware->after($request, $response, $this->settings, $table, $actionResponse);
             }
 
         } catch (\Throwable $exception) {

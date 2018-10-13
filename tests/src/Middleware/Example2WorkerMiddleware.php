@@ -10,7 +10,6 @@ namespace Lvinkim\SwordKernel\Tests\App\Middleware;
 
 
 use Lvinkim\SwordKernel\Component\WorkerMiddlewareInterface;
-use Swoole\Table;
 use Symfony\Component\DependencyInjection\Container;
 
 class Example2WorkerMiddleware implements WorkerMiddlewareInterface
@@ -28,9 +27,8 @@ class Example2WorkerMiddleware implements WorkerMiddlewareInterface
 
     /**
      * @param $settings
-     * @param Table $table
      */
-    public function __invoke($settings, Table $table)
+    public function __invoke($settings)
     {
         $workerId = $settings["workerId"] ?? 0;
         echo "worker {$workerId} - " . __METHOD__ . PHP_EOL;

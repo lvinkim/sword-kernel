@@ -66,7 +66,7 @@ class HttpServer
 
         $this->kernel = new $kernelClassName($settings);
 
-        $this->kernel->dispatchWorkerStart($workerId, $this->table);
+        $this->kernel->dispatchWorkerStart($workerId);
 
     }
 

@@ -35,8 +35,9 @@ interface RequestMiddlewareInterface
      * @param Response $response
      * @param $settings
      * @param Table $table
+     * @param ActionResponse $actionResponse
      */
-    public function after(Request $request, Response $response, $settings, Table $table);
+    public function after(Request $request, Response $response, $settings, Table $table, ActionResponse $actionResponse);
 
     /**
      * 执行顺序，值越大，优先级越高
